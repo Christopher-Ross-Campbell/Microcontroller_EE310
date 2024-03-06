@@ -9,7 +9,7 @@
 ; INPUTS: Static Set Registers
 ; Versions:
 ; 	V1.0: 03/05/2024 - First version 
-;  	V1.2: 
+;  	V1.2: 03/06/2024 - Added Additional Comments
 ;-----------------------------
 
 
@@ -22,8 +22,8 @@
 ;----------------
 ; PROGRAM INPUTS
 ;----------------
-	    refTempInput	EQU 33		
-	    measuredTempInput 	EQU 33
+	    refTempInput	EQU 15		
+	    measuredTempInput 	EQU 0
 
 
 ;----------------
@@ -33,19 +33,19 @@
 	    measuredTempREG	EQU 0x21 
 	    contReg		EQU 0x22
 
-	    refTempDEC0		EQU 0x60
+	    refTempDEC0		EQU 0x62
 	    refTempDEC1		EQU 0x61
-	    refTempDEC2		EQU 0x62
+	    refTempDEC2		EQU 0x60
 	
-	    measuredTempDEC0	EQU 0x70
+	    measuredTempDEC0	EQU 0x72
 	    measuredTempDEC1	EQU 0x71
-	    measuredTempDEC2	EQU 0x72
+	    measuredTempDEC2	EQU 0x70
 
 ;----------------
 ; PROGRAM OUTPUTS
 ;----------------
-	    HEATER     		EQU 0b00000100
-	    COOLER  		EQU 0b00000010
+	    HEATER     		EQU 0b00000010
+	    COOLER  		EQU 0b00000100
 	    NOTHING		EQU 0b00000000
   
 ;---------------------
@@ -89,7 +89,8 @@ LOOP_N2:    ADDLW	0b11110110	    ;Add -10 at start of loop
 	
 EXIT_N2:    ADDLW	10		    ;Add 10 to restore ones place value
 	    MOVWF	refTempDEC0	    ;Store ones place value
-	    GOTO	HEAT		    ;GOTO HEAT as negative measured always < refTemp
+	    GOTO	HEAT		    ;GOTO HEAT as negative measured always 
+					    ;< refTemp
 	    
 POSITIVE:   MOVLW	refTempInput	    ;Positive path
 LOOP1:	    ADDLW	0b11110110	    ;No 2's Complement needed
@@ -125,7 +126,7 @@ EXIT2:	    ADDLW	10
 	    GOTO	AC		    ;GOTO AC if negative is set
 					    ;Otherwise GOTO HEAT
 	    
-HEAT:	    MOVLW	0x01		    ;HEAT BLOCK
+HEAT:	    MOVLW	0x02		    ;HEAT BLOCK
 	    MOVWF	contReg		    ;Set contReg to 0x01
 	    MOVLW	HEATER
 	    MOVWF	PORTD		    ;Turn on PORTD2
@@ -137,7 +138,7 @@ EQUAL:	    MOVLW	0x00		    ;EQUAL BLOCK
 	    MOVWF	PORTD		    ;Turn off all PORTD
 	    GOTO	FINISH
 	
-AC:	    MOVLW	0x02		    ;AC BLOCK
+AC:	    MOVLW	0x01		    ;AC BLOCK
 	    MOVWF	contReg		    ;Set contReg to 0x02
 	    MOVLW	COOLER	    
 	    MOVWF	PORTD		    ;Turn on PORTD1
