@@ -1,15 +1,15 @@
 ;-----------------------------
-; Title: 
+; Title: Thermostat
 ;-----------------------------
-; Purpose: 
-; Dependencies: 
-; Compiler: 
+; Purpose: Activate Heating/Cooling/Nothing based on measured temp and ref temp
+; Dependencies: AssemblyConfig.inc
+; Compiler: MPLABX v6.20
 ; Author: Chris Campbell 
-; OUTPUTS: 
-; INPUTS: 
+; OUTPUTS: PORTD
+; INPUTS: Static Set Registers
 ; Versions:
-; 	V1.0: today?s date - First version 
-;  	V1.2: date - Changes something?.
+; 	V1.0: 03/05/2024 - First version 
+;  	V1.2: 
 ;-----------------------------
 
 
@@ -22,8 +22,8 @@
 ;----------------
 ; PROGRAM INPUTS
 ;----------------
-	    refTempInput	EQU 17		
-	    measuredTempInput 	EQU -19
+	    refTempInput	EQU 33		
+	    measuredTempInput 	EQU 33
 
 
 ;----------------
@@ -51,49 +51,49 @@
 ;---------------------
 ; Main Program
 ;---------------------
-	PSECT absdata,abs,ovrld        ; Do not change
-	    ORG 0x20
+	PSECT absdata,abs,ovrld		    ;Do not change
+	    ORG 0x20			    ;Start Program at 0x20
 	
-	    CLRF	refTempREG 
+	    CLRF	refTempREG	    ;Clear input registers
 	    CLRF	measuredTempREG
 	    MOVLW	0x00
-	    MOVWF	STATUS
+	    MOVWF	STATUS		    ;Clear STATUS register
 	    MOVLW	refTempInput
 	    MOVWF	refTempREG
 	    MOVLW	measuredTempInput
 	    MOVWF	measuredTempREG
-	    ADDLW	0x00	
-	    BN		NEGATIVE0
-	    GOTO	POSITIVE
+	    ADDLW	0x00		    ;Set STATUS N bit if measuredTemp is NEG
+	    BN		NEGATIVE0	    ;Branch to negative section 
+	    GOTO	POSITIVE	    ;Otherwise jump to positive section
 
-NEGATIVE0:  MOVLW	measuredTempInput
+NEGATIVE0:  MOVLW	measuredTempInput   ;Negative Path
 	    MOVWF	measuredTempREG
-	    COMF	measuredTempREG,0
+	    COMF	measuredTempREG,0   ;2's Complement of neg. measuredTemp
 	    INCF	WREG
 	    
-LOOP_N1:    ADDLW	0b11110110
-	    BN		EXIT_N1
-	    INCF	measuredTempDEC1
-	    GOTO	LOOP_N1
+LOOP_N1:    ADDLW	0b11110110	    ;Add -10 at start of loop
+	    BN		EXIT_N1		    ;Exit loop when N bit is set
+	    INCF	measuredTempDEC1    ;Increment tens place for each loop
+	    GOTO	LOOP_N1		    ;Loop if not negative 
 	
-EXIT_N1:    ADDLW	10
-	    MOVWF	measuredTempDEC0
+EXIT_N1:    ADDLW	10		    ;Add 10 to restore ones place velue
+	    MOVWF	measuredTempDEC0    ;Store ones place value
 	    
-	    MOVLW	0x00
+	    MOVLW	0x00		    ;Clear WREG
 	    
-	    MOVLW	refTempInput
-LOOP_N2:    ADDLW	0b11110110
-	    BN		EXIT_N2
-	    INCF	refTempDEC1
-	    GOTO	LOOP_N2
+	    MOVLW	refTempInput	    ;Move refTemp to WREG
+LOOP_N2:    ADDLW	0b11110110	    ;Add -10 at start of loop
+	    BN		EXIT_N2		    ;Exit loop when N bit is set
+	    INCF	refTempDEC1	    ;Incriment tens place for each loop
+	    GOTO	LOOP_N2		    ;Loop if not negative
 	
-EXIT_N2:    ADDLW	10
-	    MOVWF	refTempDEC0
-	    GOTO	HEAT   
+EXIT_N2:    ADDLW	10		    ;Add 10 to restore ones place value
+	    MOVWF	refTempDEC0	    ;Store ones place value
+	    GOTO	HEAT		    ;GOTO HEAT as negative measured always < refTemp
 	    
-POSITIVE:   MOVLW	refTempInput
-LOOP1:	    ADDLW	0b11110110
-	    BN		EXIT1
+POSITIVE:   MOVLW	refTempInput	    ;Positive path
+LOOP1:	    ADDLW	0b11110110	    ;No 2's Complement needed
+	    BN		EXIT1		    ;Decimal register process is same as negative
 	    INCF	refTempDEC1
 	    GOTO	LOOP1
 	
@@ -111,40 +111,40 @@ LOOP2:	    ADDLW	0b11110110
 EXIT2:	    ADDLW	10
 	    MOVWF	measuredTempDEC0
 	
-	    MOVLW	0x00
-	    MOVWF	TRISD
-	    MOVWF	STATUS
+	    MOVLW	0x00		    
+	    MOVWF	TRISD		    ;Set TRISD to output
+	    MOVWF	STATUS		    ;Clear STATUS
 	    MOVLW	refTempInput
 	    MOVWF	refTempREG
 	    MOVLW	measuredTempInput
 	    MOVWF	measuredTempREG
-	    SUBWF	refTempREG,0
-	    BTFSC	STATUS,2
-	    GOTO	EQUAL
-	    BTFSC	STATUS,4
-	    GOTO	AC
-	    BTFSS	STATUS,4
-	    GOTO	HEAT
-	
-EQUAL:	    MOVLW	0x00
-	    MOVWF	contReg
-	    MOVLW	NOTHING
-	    MOVWF	PORTD
-	    GOTO	FINISH
-	
-AC:	    MOVLW	0x02
-	    MOVWF	contReg
-	    MOVLW	COOLER
-	    MOVWF	PORTD
-	    GOTO	FINISH
-	
-HEAT:	    MOVLW	0x01
-	    MOVWF	contReg
+	    SUBWF	refTempREG,0	    ;Subtract measuredTemp from refTemp
+	    BTFSC	STATUS,2	    ;Check zero bit
+	    GOTO	EQUAL		    ;GOTO EQUAL if zero bit is set
+	    BTFSC	STATUS,4	    ;Check negative bit, skip if clear
+	    GOTO	AC		    ;GOTO AC if negative is set
+					    ;Otherwise GOTO HEAT
+	    
+HEAT:	    MOVLW	0x01		    ;HEAT BLOCK
+	    MOVWF	contReg		    ;Set contReg to 0x01
 	    MOVLW	HEATER
-	    MOVWF	PORTD
+	    MOVWF	PORTD		    ;Turn on PORTD2
+	    GOTO	FINISH	    
+	    	    
+EQUAL:	    MOVLW	0x00		    ;EQUAL BLOCK
+	    MOVWF	contReg		    ;Set contReg to 0x00
+	    MOVLW	NOTHING		    
+	    MOVWF	PORTD		    ;Turn off all PORTD
+	    GOTO	FINISH
+	
+AC:	    MOVLW	0x02		    ;AC BLOCK
+	    MOVWF	contReg		    ;Set contReg to 0x02
+	    MOVLW	COOLER	    
+	    MOVWF	PORTD		    ;Turn on PORTD1
 	    GOTO	FINISH
 	    
 FINISH:	
+	    SLEEP
 	    END
 
 	
