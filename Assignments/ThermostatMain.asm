@@ -126,10 +126,10 @@ EXIT2:	    ADDLW	10
 	    GOTO	AC		    ;GOTO AC if negative is set
 					    ;Otherwise GOTO HEAT
 	    
-HEAT:	    MOVLW	0x02		    ;HEAT BLOCK
+HEAT:	    MOVLW	0x01		    ;HEAT BLOCK
 	    MOVWF	contReg		    ;Set contReg to 0x01
 	    MOVLW	HEATER
-	    MOVWF	PORTD		    ;Turn on PORTD2
+	    MOVWF	PORTD		    ;Turn on PORTD1
 	    GOTO	FINISH	    
 	    	    
 EQUAL:	    MOVLW	0x00		    ;EQUAL BLOCK
@@ -138,10 +138,10 @@ EQUAL:	    MOVLW	0x00		    ;EQUAL BLOCK
 	    MOVWF	PORTD		    ;Turn off all PORTD
 	    GOTO	FINISH
 	
-AC:	    MOVLW	0x01		    ;AC BLOCK
+AC:	    MOVLW	0x02		    ;AC BLOCK
 	    MOVWF	contReg		    ;Set contReg to 0x02
 	    MOVLW	COOLER	    
-	    MOVWF	PORTD		    ;Turn on PORTD1
+	    MOVWF	PORTD		    ;Turn on PORTD2
 	    GOTO	FINISH
 	    
 FINISH:	
