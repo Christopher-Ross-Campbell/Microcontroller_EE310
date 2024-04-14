@@ -47,7 +47,7 @@ int GetOperator(void);
 // Function name: InitKeypad
 void InitKeypad(void)
 {
-	TRISA = 0;
+    TRISA = 0;
     LATA = 0;
     PORTA =0;
     ANSELA = 0;
