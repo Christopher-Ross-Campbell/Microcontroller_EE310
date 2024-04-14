@@ -35,7 +35,6 @@
 #define C4			RB7
 
 // Function declarations
-
 void InitKeypad(void);
 int GetKey(void);
 int ReadSwitches(void);
@@ -47,7 +46,7 @@ int GetOperator(void);
 // Function name: InitKeypad
 void InitKeypad(void)
 {
-    TRISA = 0;
+	TRISA = 0;
     LATA = 0;
     PORTA =0;
     ANSELA = 0;
@@ -57,7 +56,7 @@ void InitKeypad(void)
     PORTB = 0;
     ANSELB = 0;
     
-    TRISD = 0;
+    TRISD = 0; 
     LATD = 0;
     PORTD =0;
     ANSELD = 0;
@@ -240,14 +239,14 @@ int GetKey(void)           	 // Get key from user
 int GetResult(int Operation_REG, int X_Input_REG, int Y_Input_REG){
     switch(Operation_REG){
         int Display_Result_REG = 0;
-        case 10:
+        case 10:                                                //Addition
             Display_Result_REG = (X_Input_REG + Y_Input_REG);
             PORTD = Display_Result_REG;
             PORTA = 0;
             break;
-        case 11:
+        case 11:                                                //Subtraction
             Display_Result_REG = (X_Input_REG - Y_Input_REG);
-            if (Display_Result_REG < 0){
+            if (Display_Result_REG < 0){                        //If NEG, 2's Comp
                 Display_Result_REG = ~Display_Result_REG+1;
                 PORTD = Display_Result_REG;
                 PORTA = 4;
@@ -258,12 +257,12 @@ int GetResult(int Operation_REG, int X_Input_REG, int Y_Input_REG){
                 PORTA = 0;
             break; 
             }
-        case 12:
+        case 12:                                                //Multiplication
             Display_Result_REG = (X_Input_REG * Y_Input_REG); 
             PORTD = Display_Result_REG;
             PORTA = 0;
             break;
-        case 15:
+        case 15:                                                //Division
             Display_Result_REG = (X_Input_REG / Y_Input_REG);
             PORTD = Display_Result_REG;
             PORTA = 0;
@@ -274,25 +273,26 @@ int GetResult(int Operation_REG, int X_Input_REG, int Y_Input_REG){
 int main()
 {
 	InitKeypad();
- 
+    
 	while(1)
 	{
-            int X_Input_REG = GetFirstNumber();
-            PORTD = X_Input_REG;
-            PORTA = 1;
-            int Operation_REG = GetOperator();
-            PORTD = Operation_REG;
-            int Y_Input_REG = GetSecondNumber();
-            PORTD = Y_Input_REG;
-            PORTA = 2;
+            int X_Input_REG = GetFirstNumber(); //Get first number from Keypad
+            PORTD = X_Input_REG;                //Set PORTD to check INPUT1
+            PORTA = 1;                          //Set First LED for INPUT1
+            int Operation_REG = GetOperator();  //Get operator from Keypad
+           
+            int Y_Input_REG = GetSecondNumber();    //Get second number from Keypad
+            PORTD = Y_Input_REG;                    //Set PORTD to check INPUT2
+            PORTA = 2;                              //Set Second LED for INPUT2
 
             if (GetKey() == 14){
-               GetResult(Operation_REG, X_Input_REG, Y_Input_REG);      
+               GetResult(Operation_REG, X_Input_REG, Y_Input_REG);   //Calculate result based on operator  
+                                                                     //when # is pressed
             }
-            while(GetKey() != 13){
+            while(GetKey() != 13){                                   //Unless STAR is pressed, wait
                 __delay_ms(250);
             }
-            PORTD = 0;
+            PORTD = 0;                                               //Reset 
             PORTA = 0;
     }
 }
