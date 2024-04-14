@@ -15,7 +15,7 @@
  * Compiler: xc8, 2.4
  * Author: Chris Campbell
  * Versions:    V1.0: Original
- *              V1.1: 
+ *              V1.1: Added Comments
 */
 
 #include <xc.h> // must have this
