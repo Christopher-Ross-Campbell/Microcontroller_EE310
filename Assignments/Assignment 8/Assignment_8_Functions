@@ -1,1 +1,173 @@
+/* 
+ * File:   Assignment_8_Functions.h
+ * Author: Chris Campbell
+ *
+ * Created on April 23, 2024, 10:11 AM
+ */
+
+#ifndef ASSIGNMENT_8_FUNCTIONS_H
+#define	ASSIGNMENT_8_FUNCTIONS_H
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+#include <xc.h>
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Config.h"
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Functions.h"
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Initialization.h"
+
+#define _XTAL_FREQ 4000000                 
+#define FCY    _XTAL_FREQ/4
+    
+int Secret_Code = 43;
+int First_Number = 0;
+int Second_Number = 0;
+int Total = 0;
+    
+int Get_First_Number(void)
+{
+    PORTD = 0x3F;
+    int temp1 = 0;
+    
+    while (PORTAbits.RA2 != 1){
+        if (PORTAbits.RA4 == 1)
+        {
+            __delay_ms(500);
+            temp1 = temp1 + 1;
+            switch(temp1)
+            {
+                case 1: PORTD = 0x06;
+                        __delay_ms(500);
+                        break;
+                case 2: PORTD = 0x5B;
+                        __delay_ms(500);
+                        break;
+                case 3: PORTD = 0x4F;
+                        __delay_ms(500);
+                        break;
+                case 4: PORTD = 0x66;
+                        __delay_ms(500);
+                        break;
+                case 5: PORTD = 0x6D;
+                        __delay_ms(500);
+                        break;
+                case 6: PORTD = 0x7D;
+                        __delay_ms(500);
+                        break;
+                case 7: PORTD = 0x07;
+                        __delay_ms(500);
+                        break;
+                case 8: PORTD = 0x7F;
+                        __delay_ms(500);
+                        break;
+                case 9: PORTD = 0x67;
+                        __delay_ms(500);
+                        break;
+                default: PORTD = 0x80;
+                
+            }
+        }
+    }
+    First_Number = 10*temp1;
+    temp1 = 0;
+}
+
+int Get_Second_Number(void){
+    PORTD = 0x3F;
+    int temp2 = 0;
+    
+    while (PORTAbits.RA2 != 1){
+        if (PORTAbits.RA5 == 1)
+        {
+            __delay_ms(500);
+            temp2 = temp2 + 1;
+            switch(temp2)
+            {
+                case 1: PORTD = 0x06;
+                        __delay_ms(500);
+                        break;
+                case 2: PORTD = 0x5B;
+                        __delay_ms(500);
+                        break;
+                case 3: PORTD = 0x4F;
+                        __delay_ms(500);
+                        break;
+                case 4: PORTD = 0x66;
+                        __delay_ms(500);
+                        break;
+                case 5: PORTD = 0x6D;
+                        __delay_ms(500);
+                        break;
+                case 6: PORTD = 0x7D;
+                        __delay_ms(500);
+                        break;
+                case 7: PORTD = 0x07;
+                        __delay_ms(500);
+                        break;
+                case 8: PORTD = 0x7F;
+                        __delay_ms(500);
+                        break;
+                case 9: PORTD = 0x67;
+                        __delay_ms(500);
+                        break;
+                default: PORTD = 0x80;
+                
+            }
+        }
+    }
+    Second_Number = temp2;
+    temp2 = 0;
+}
+
+void __interrupt(irq(IRQ_INT0),base(0x4008)) INT0_ISR(void)
+{
+        if (PIR1bits.INT0IF == 1) { // Check for interrupt flag
+            PORTAbits.RA3=0;
+            for (int k = 0; k < 10; k++) {
+                PORTAbits.RA3 = !PORTAbits.RA3; 
+                __delay_ms(500);
+            }
+            PIR1bits.INT0IF = 0;  // Clear interrupt flag when done
+            PORTAbits.RA3=0;
+            __delay_ms(500);
+            PORTAbits.RA3=0;
+    }
+}   
+    
+int Determine_Code(void){
+    Total = First_Number + Second_Number;
+    if (Total == Secret_Code){
+        PORTAbits.RA0=1;
+        __delay_ms(1000);
+        PORTAbits.RA0=0;
+        __delay_ms(1000);
+        PORTAbits.RA1=1;
+        __delay_ms(1000);
+        PORTAbits.RA1=0;
+        __delay_ms(1000);
+    }
+    else{
+        PORTAbits.RA3 = 1;
+        __delay_ms(2000);
+        PORTAbits.RA3 = 0;
+        __delay_ms(2000);
+    }
+    First_Number = 0;
+    Second_Number = 0;
+    Total = 0;
+}
+
+
+    
+    
+    
+    
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif	/* ASSIGNMENT_8_FUNCTIONS_H */
+
 
