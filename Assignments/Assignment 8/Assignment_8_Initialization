@@ -1,1 +1,61 @@
+/* 
+ * File:   Assignment_8_Initialization.h
+ * Author: Chris Campbell
+ *
+ * Created on April 23, 2024, 10:18 AM
+ */
+
+#ifndef ASSIGNMENT_8_INITIALIZATION_H
+#define	ASSIGNMENT_8_INITIALIZATION_H
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+#include <xc.h>
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Config.h"
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Functions.h"
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Initialization.h"
+    
+    
+#define _XTAL_FREQ 4000000                 
+#define FCY    _XTAL_FREQ/4
+    
+void INTERRUPT_Initialize (void)
+{
+    INTCON0bits.IPEN = 1; 
+    INTCON0bits.GIEH = 1; 
+    INTCON0bits.GIEL = 1; 
+    INTCON0bits.INT0EDG = 1; 
+    IPR1bits.INT0IP = 1; 
+    PIE1bits.INT0IE = 1;
+    PIR1bits.INT0IF = 0;  
+  
+    IVTBASEU = 0x00;
+    IVTBASEH = 0x40; 
+    IVTBASEL = 0x08; 
+}
+
+void Port_Initialization(void){
+      // Initialization  
+    ANSELD = 0b00000000;
+    TRISD = 0b00000000;  
+    PORTD = 0b00000000; 
+    ANSELB = 0b00000000;
+    TRISB = 0b00000001; 
+    PORTB = 0b00000000; 
+    ANSELA = 0b00000000;
+    TRISA = 0b00110100;  
+    PORTA = 0b00000000; 
+    
+    WPUB=0xFF; // weak pull-ups are enabled for port B
+}
+
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif	/* ASSIGNMENT_8_INITIALIZATION_H */
+
 
