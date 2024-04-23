@@ -1,1 +1,46 @@
 
+/*
+ * ---------------------
+ * Title: Assignment 8: I/O Port Project
+ * ---------------------
+ * Program Details: Interface PIC18 with Assorted Peripherals
+ *                  Relay with Driver, Isolated Motor
+ *                  Photo-resistors with Drivers
+ *                 
+ * Inputs: RA2,RA4,RA5
+ * Outputs: RA0,RA1,RA3,PORTD
+ * Setup: C- Simulator
+ * Date: 04/13/2024
+ * File Dependencies / Libraries: Assignment_8_Config.h
+ *                                Assignment_8_Functions.h
+ *                                Assignment_8_Initialization.h
+ *                                  
+ * Compiler: XC8, 2.4
+ * Author: Chris Campbell
+ * Versions:    V1.0: Original
+ *              V1.1: Added Comments
+ *              V1.2: Added Header Files for FXN and INIT
+*/
+#include <xc.h>
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Config.h"
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Functions.h"
+#include "C:\Users\crcca\MPLABXProjects\Assignment_8.X\Assignment_8_Initialization.h"
+
+#define _XTAL_FREQ 4000000                 
+#define FCY    _XTAL_FREQ/4
+
+void main(void) {
+    
+    Port_Initialization();
+    INTERRUPT_Initialize();
+    
+    while(1)
+    {
+        Get_First_Number();
+        __delay_ms(500);
+        Get_Second_Number();
+        __delay_ms(500);
+        Determine_Code();
+        __delay_ms(500);
+    }
+ }
