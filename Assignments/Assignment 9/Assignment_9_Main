@@ -3,6 +3,7 @@
  * Author: Chris Campbell
  *
  * Created on April 30, 2024, 11:15 PM
+ * Removed Decimal places from Lux reading- 05/01/2024
  */
 
 
@@ -60,7 +61,7 @@ void main(void)
         //LCD_String_xy(2,4,data);              /*Display string at location(row,location). */
                                                 /* This function passes string to display */   
         
-        sprintf(data,"%.2f",lux);
+        sprintf(data,"%.0f",lux);
         strcat(data," Lux");                    /*Concatenate result and unit to print*/
     
         LCD_String_xy(1,0,"Ambient Light:");    /* Display string at location(row,location). */
